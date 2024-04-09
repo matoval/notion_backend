@@ -66,10 +66,15 @@ func GetNotionData() {
 	}
 	var changeResult changeResult
 	json.Unmarshal(body, &changeResult)
-	for i := 0; i < len(changeResult.Results); i++ {
-		// if changeResult.Results[i] != nil {
-		// 	continue;
-		// }
-		fmt.Printf("Test: %v\n",changeResult.Results[i])
-	}
+	fmt.Print(PrettyPrint(changeResult.Results))
+	// for i := 0; i < len(changeResult.Results); i++ {
+	// 	// if changeResult.Results[i] != nil {
+	// 	// 	continue;
+	// 	// }
+	// }
+}
+
+func PrettyPrint(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }
