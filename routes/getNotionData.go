@@ -6,13 +6,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"notion_backend/db"
+	"notion_backend/models"
 	"os"
 	"time"
 )
 
-type changeResult struct {
+type Results struct {
 	Object         string `json:"object"`
-	Results        []any  `json:"results"`
+	Results        []models.NotionData  `json:"results"`
 	NextCursor     any    `json:"next_cursor"`
 	HasMore        bool   `json:"has_more"`
 	Type           string `json:"type"`
@@ -35,7 +37,7 @@ type Filter struct {
 
 func GetNotionData() {
 	var bearer = "Bearer " + os.Getenv("NOTION_KEY")
-	timeLapse := time.Now().Add(-3100 * time.Minute)
+	timeLapse := time.Now().Add(-31000 * time.Minute)
 	payload, err := json.Marshal(Filter{
 		Filters: Filters{
 			Timestamp: "last_edited_time",
@@ -64,9 +66,10 @@ func GetNotionData() {
 	if err != nil {
 		fmt.Printf("ReadAll failed, error: %v\n", err)
 	}
-	var changeResult changeResult
+	var changeResult Results
 	json.Unmarshal(body, &changeResult)
-	fmt.Print(PrettyPrint(changeResult.Results))
+	db.AddNotionData(changeResult.Results)
+	// fmt.Print(PrettyPrint(changeResult.Results))
 	// for i := 0; i < len(changeResult.Results); i++ {
 	// 	// if changeResult.Results[i] != nil {
 	// 	// 	continue;
