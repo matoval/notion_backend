@@ -18,16 +18,23 @@ func CreateDatabase() {
 	sql := `CREATE TABLE IF NOT EXISTS notion (
 		id INTEGER PRIMARY KEY,
 		archived BOOL,
-		cover JSON,
-		createdby JSON,
+		coverurl TEXT,
+		coverexpirytime TEXT,
+		createdbyid TEXT,
+		createdbyobject TEXT
 		createdtime TEXT,
-		icon JSON,
+		icontype TEXT,
+		iconurl TEXT,
+		iconexpirytime TEXT,
+		iconemoji TEXT,
 		intrash BOOL,
-		lasteditedby JSON,
+		lasteditedbyid TEXT,
+		lasteditedbyobject TEXT,
 		lasteditedtime TEXT,
 		object TEXT,
-		parent JSON,
-		properties JSON,
+		parentdatabaseid TEXT,
+		parenttype TEXT,
+		properties BLOB,
 		publicurl TEXT,
 		url TEXT
 	);`
@@ -45,14 +52,13 @@ func AddNotionData(notionData []models.NotionData) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO notion(id, archived, cover, createdby, createdtime, icon, intrash, lasteditedby, lasteditedtime, object, parent, properties, publicurl, url) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	stmt, err := db.Prepare("INSERT INTO notion(id, archived, coverurl, coverexpirytime, createdbyid, createdbyobject, createdtime, icontype, iconurl, iconexpirytime, iconemoji, intrash, lasteditedbyid, lastediedbyobject, lasteditedtime, object, parentdatabaseid, parenttype, properties, publicurl, url) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		fmt.Printf("Database prepare failed with error: %v", err)
 	}
 
 	for _, data := range notionData {
-		fmt.Appendf("%v \n", string(data))
-		_, err = stmt.Exec(data.Id, data.Archived, data.Cover, data.CreatedBy, data.CreatedTime, data.Icon, data.InTrash, data.LastEditedBy, data.LastEditedTime, data.Object, data.Parent, data.Properties, data.PublicUrl, data.Url)
+		_, err = stmt.Exec(data.Id, data.Archived, data.Cover.Url, data.Cover.ExpiryTime, data.CreatedBy.Id, data.CreatedBy.Object, data.CreatedTime, data.Icon.Type, data.Icon.Url, data.Icon.ExpiryTime, data.Icon.Emoji, data.InTrash, data.LastEditedBy.Id, data.LastEditedBy.Object, data.LastEditedTime, data.Object, data.Parent.DatabaseId, data.Parent.Type, data.Properties, data.PublicUrl, data.Url)
 		if err != nil {
 			fmt.Printf("Database failed to add notion data with error: %v", err)
 		}
